@@ -32,10 +32,21 @@ pub mod rectangle {
         pub fn print_rect(&self) {
             println!("The rectangle is {:#?}", self);
         }
+
+        pub fn square(size: u32) -> Rectangle {
+            Rectangle {
+                width: size,
+                height: size
+            }
+        }
     }
 
     pub fn get_rect(width: u32, height: u32) -> Rectangle {
         Rectangle { width, height }
+    }
+
+    pub fn get_square_rect(size: u32) -> Rectangle {
+        Rectangle::square(size)
     }
 
 }

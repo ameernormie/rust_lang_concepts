@@ -15,4 +15,9 @@ fn main() {
         "The area of rectangle is {}",
         rect.area()
     );
+    let a_square_rect = rectangle::get_square_rect(10);
+    println!(
+        "The square rectangle is {:#?}",
+        a_square_rect
+    );
 }
