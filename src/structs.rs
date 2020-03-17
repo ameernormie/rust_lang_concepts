@@ -24,11 +24,18 @@ pub mod rectangle {
         height: u32,
     }
 
+    impl Rectangle {
+        pub fn area(&self) -> u32 {
+            self.width * self.height
+        }
+
+        pub fn print_rect(&self) {
+            println!("The rectangle is {:#?}", self);
+        }
+    }
+
     pub fn get_rect(width: u32, height: u32) -> Rectangle {
         Rectangle { width, height }
     }
 
-    pub fn calculate_area(rect: &Rectangle) -> u32 {
-        rect.height * rect.width
-    }
 }

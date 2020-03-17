@@ -10,9 +10,9 @@ fn main() {
     println!("Is user active {}", ameer.active);
 
     let rect = rectangle::get_rect(30, 30);
-    println!("The rectangle is {:#?}", rect);
+    rect.print_rect();
     println!(
         "The area of rectangle is {}",
-        rectangle::calculate_area(&rect)
+        rect.area()
     );
 }
