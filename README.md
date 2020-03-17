@@ -1,5 +1,18 @@
 # Rust Concepts
 
+### Table of Contents
+
+- [1 Structs](#structs)
+  - [1.1 Create instances from other instances](#create-instances-from-other-instances)
+    - [1.1.1 Without update syntax](#without-update-syntax)
+    - [1.1.1 With update syntax](#with-update-syntax)
+  - [1.2 Tuple Structs](#tuple-structs)
+  - [1.3 Unit like Structs without any fields](#unit-like-structs-without-any-fields)
+  - [1.4 Method Syntax](#method-syntax)
+    - [1.4.1 Defining methods](#defining-methods)
+    - [1.4.2 Associated functions](#associated-functions)
+  - [1.5 Ownership of Struct Data](#ownership-of-struct-data)
+
 ### Structs
 
 **A struct, or structure, is a custom data type that lets you name and package together multiple related values that make up a meaningful group.**
