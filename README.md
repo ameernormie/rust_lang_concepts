@@ -18,6 +18,7 @@
   - [2.3 Option Enum](#option-enum)
   - [2.4 Match Control Flow Operator](#match-control-flow-operator)
     - [2.4.1 Patterns that Bind to Values](#patterns-that-bind-to-values)
+    - [2.4.2 Matching with Option<T>](#matching-with-option)
 
 ### Structs
 
@@ -330,5 +331,26 @@ fn value_in_cents(coin: Coin) -> u8 {
             25
         },
     }
+}
+```
+
+###### Matching with `Option`
+
+In the previous section, we wanted to get the inner `T` value out of the Some case when using`Option<T>`; we can also handle`Option<T>` using match as we did with the Coin enum! Instead of comparing coins, we’ll compare the variants of`Option<T>`, but the way that the match expression works remains the same.
+
+Matches in Rust are exhaustive: we must exhaust every last possibility in order for the code to be valid. Especially in the case of `Option<T>`, when Rust prevents us from forgetting to explicitly handle the `None` and `Some` cases.
+
+###### The `_` pattern
+
+Rust also has a pattern we can use when we don’t want to list all possible values. For example, a u8 can have valid values of 0 through 255. If we only care about the values 1, 3, 5, and 7, we don’t want to have to list out 0, 2, 4, 6, 8, 9 all the way up to 255. Fortunately, we don’t have to: we can use the special pattern \_ instead:
+
+```rust
+let some_u8_value = 0u8;
+match some_u8_value {
+    1 => println!("one"),
+    3 => println!("three"),
+    5 => println!("five"),
+    7 => println!("seven"),
+    _ => (),
 }
 ```

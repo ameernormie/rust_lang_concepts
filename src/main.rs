@@ -56,6 +56,19 @@ fn main() {
         "Quarter of state Alabama has value in cents using enum coin {:?}",
         value_in_cents(Coin::Quarter(UsState::Alabama))
     );
+
+    let five = Some(5);
+    let six = plus_one(five);
+    println!("The six is {:?}", six);
+    let none = plus_one(None);
+    println!("The none is {:?}", none);
+
+    let get_value = match five {
+        None => 0,
+        Some(i) => i,
+    };
+
+    println!("get value from option {} ", get_value);
 }
 
 fn value_in_cents(coin: Coin) -> u8 {
@@ -67,5 +80,12 @@ fn value_in_cents(coin: Coin) -> u8 {
             println!("the state of quarter is {:?}", state);
             25
         }
+    }
+}
+
+fn plus_one(x: Option<i32>) -> Option<i32> {
+    match x {
+        None => None,
+        Some(x) => Some(x + 1),
     }
 }
