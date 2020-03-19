@@ -19,6 +19,7 @@
   - [2.4 Match Control Flow Operator](#match-control-flow-operator)
     - [2.4.1 Patterns that Bind to Values](#patterns-that-bind-to-values)
     - [2.4.2 Matching with Option<T>](#matching-with-option)
+  - [2.5 Concise Control Flow with if let](#concise-control-flow-with-if-let)
 
 ### Structs
 
@@ -352,5 +353,33 @@ match some_u8_value {
     5 => println!("five"),
     7 => println!("seven"),
     _ => (),
+}
+```
+
+##### Concise Control Flow with if let
+
+The `if let` syntax lets you combine if and let into a less verbose way to handle values that match one pattern while ignoring the rest.
+
+```rust
+let some_u8_value = Some(0u8);
+match some_u8_value {
+    Some(3) => println!("three"),
+    _ => (),
+}
+
+// Instead we can write the above code as this (less verbose)
+if let Some(3) = some_u8_value {
+    println!("three");
+}
+```
+
+We can include an `else` with an `if let`. The block of code that goes with the `else` is the same as the block of code that would go with the \_ case in the match expression that is equivalent to the `if let` and else.
+
+```rust
+let mut count = 0;
+if let Coin::Quarter(state) = coin {
+    println!("State quarter from {:?}!", state);
+} else {
+    count += 1;
 }
 ```

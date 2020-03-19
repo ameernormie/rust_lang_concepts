@@ -69,6 +69,13 @@ fn main() {
     };
 
     println!("get value from option {} ", get_value);
+
+    let some_value = Some(3);
+    if let Some(3) = some_value {
+        println!("The value is three");
+    } else {
+        println!("The value is not three");
+    }
 }
 
 fn value_in_cents(coin: Coin) -> u8 {
