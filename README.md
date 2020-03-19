@@ -16,6 +16,8 @@
   - [2.1 Defining Enums](#defining-enums)
   - [2.2 Enums Values](#enums-values)
   - [2.3 Option Enum](#option-enum)
+  - [2.4 Match Control Flow Operator](#match-control-flow-operator)
+    - [2.4.1 Patterns that Bind to Values](#patterns-that-bind-to-values)
 
 ### Structs
 
@@ -274,3 +276,59 @@ let sum = x + y;
 In other words, you have to convert an `Option<T>` to a `T` before you can perform T operations with it. Generally, this helps catch one of the most common issues with null: assuming that something isn’t null when it actually is.
 **Everywhere that a value has a type that isn’t an `Option<T>`, you can safely assume that the value isn’t null.**
 In order to use an `Option<T>` value, you want to have code that will handle each variant. You want some code that will run only when you have a Some(T) value, and this code is allowed to use the inner `T`. You want some other code to run if you have a None value, and that code doesn’t have a `T` value available.
+
+##### `Match` Control flow Operator
+
+Rust has an extremely powerful control flow operator called `match` that allows you to compare a value against a series of patterns and then execute code based on which pattern matches.
+
+```rust
+enum Coin {
+    Penny,
+    Nickel,
+    Dime,
+    Quarter,
+}
+
+fn value_in_cents(coin: Coin) -> u8 {
+    match coin {
+        Coin::Penny => 1,
+        Coin::Nickel => 5,
+        Coin::Dime => 10,
+        Coin::Quarter => 25,
+    }
+}
+```
+
+The code associated with each arm is an expression, and the resulting value of the expression in the matching arm is the value that gets returned for the entire match expression.
+
+###### Patterns that Bind to Values
+
+Another useful feature of match arms is that they can bind to the parts of the values that match the pattern. This is how we can extract values out of enum variants.
+
+```rust
+#[derive(Debug)] // so we can inspect the state in a minute
+enum UsState {
+    Alabama,
+    Alaska,
+    // --snip--
+}
+
+enum Coin {
+    Penny,
+    Nickel,
+    Dime,
+    Quarter(UsState),
+}
+
+fn value_in_cents(coin: Coin) -> u8 {
+    match coin {
+        Coin::Penny => 1,
+        Coin::Nickel => 5,
+        Coin::Dime => 10,
+        Coin::Quarter(state) => {
+            println!("State quarter from {:?}!", state);
+            25
+        },
+    }
+}
+```
