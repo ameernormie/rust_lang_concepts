@@ -23,7 +23,7 @@ enum Coin {
 #[allow(unused_variables)]
 #[allow(dead_code)]
 fn main() {
-    println!("******************Structs*******************\n");
+    println!("\n******************Structs*******************\n");
     let ameer =
         user_struct::build_user(String::from("ameer"), String::from("ameernormie@gmail.com"));
 
@@ -76,6 +76,37 @@ fn main() {
     } else {
         println!("The value is not three");
     }
+
+    println!("\n\n\n******************Collections*******************\n");
+    println!("******************Vectors*******************\n");
+    let mut v = vec![1, 2, 3];
+    v.push(8);
+    println!("vector v vec![1, 2, 3] after pushing a value is {:?}", v);
+
+    // Referncing a vector value
+    let third: &i32 = &v[2];
+
+    println!("vector v is {}", third);
+    // Referencing using get: v.get(2) gives us the Option<&T>
+    match v.get(2) {
+        Some(third) => println!("The third element is {}", third),
+        None => println!("There is no third element"),
+    };
+
+    // Iterating over vectors
+    for i in &v {
+        println!(
+            "Iterating over vector v and value of current iteration is {}",
+            i
+        );
+    }
+
+    // Iterating over mutable references
+    for i in &mut v {
+        *i += 50;
+    }
+
+    println!("vector v mutating each value a value is {:?}", v);
 }
 
 fn value_in_cents(coin: Coin) -> u8 {

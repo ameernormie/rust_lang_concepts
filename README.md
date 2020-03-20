@@ -20,6 +20,15 @@
     - [2.4.1 Patterns that Bind to Values](#patterns-that-bind-to-values)
     - [2.4.2 Matching with Option<T>](#matching-with-option)
   - [2.5 Concise Control Flow with if let](#concise-control-flow-with-if-let)
+- [3 Common Collections](#common-collections)
+  - [3.1 Vectors](#vectors)
+    - [3.1.1 Creating a New Vector](#creating-a-new-vector)
+    - [3.1.2 Updating a Vector](#updating-a-vector)
+    - [3.1.3 Reading Elements of Vector](#reading-elements-of-vector)
+    - [3.1.4 Iterating over values of Vector](#iterating-over-values-of-vector)
+    - [3.1.5 Using an Enum to Store Multiple Types](#using-an-enum-to-store-multiple-types)
+  - [3.2 String](#string)
+  - [3.3 Hash Maps](#hash-maps)
 
 ### Structs
 
@@ -383,3 +392,112 @@ if let Coin::Quarter(state) = coin {
     count += 1;
 }
 ```
+
+### Common Collections
+
+Rust’s standard library includes a number of very useful data structures called collections. Most other data types represent one specific value, but collections can contain multiple values. Unlike the built-in array and tuple types, the data these collections point to is stored on the heap, which means the amount of data does not need to be known at compile time and can grow or shrink as the program runs. Each kind of collection has different capabilities and costs, and choosing an appropriate one for your current situation is a skill you’ll develop over time. In this chapter, we’ll discuss three collections that are used very often in Rust programs:
+
+1. `Vector`: A vector allows you to store a variable number of values next to each other.
+2. `String`: A string is a collection of characters. We’ve mentioned the String type previously, but in this chapter we’ll talk about it in depth.
+3. `Hash Map`: A hash map allows you to associate a value with a particular key. It’s a particular implementation of the more general data structure called a map.
+
+#### Vectors
+
+Vectors allow you to store more than one value in a single data structure that `puts all the values next to each other in memory`. Vectors can only store values of the same type.
+
+##### Creating a New Vector
+
+```rust
+let v: Vec<i32> = Vec::new();
+```
+
+We added a type annotation here. Because we aren’t inserting any values into this vector, Rust doesn’t know what kind of elements we intend to store.
+
+Rust can often infer the type of value you want to store once you insert values, so you rarely need to do this type annotation. It’s more common to create a `Vec<T>` that has initial values, and Rust provides the vec! macro for convenience.
+
+```rust
+let v = vec![1, 2, 3];
+```
+
+##### Updating a Vector
+
+```rust
+let mut v = Vec::new();
+
+v.push(5);
+```
+
+##### Reading Elements of Vector
+
+There are two ways to reference a value stored in a `vector`.
+
+1. Using reference to the element like `let value = &v[1]`
+2. Using `get` method, like `v.get(1)`. This gives us the `Option<&T>`
+
+```rust
+let v = vec![1, 2, 3, 4, 5];
+
+let third: &i32 = &v[2];
+println!("The third element is {}", third);
+
+match v.get(2) {
+    Some(third) => println!("The third element is {}", third),
+    None => println!("There is no third element."),
+}
+```
+
+```rust
+let v = vec![1, 2, 3, 4, 5];
+
+// This method will cause the program to panic because it references a nonexistent element.
+let does_not_exist = &v[100];
+
+// This is same because it will return `None` without panicking
+let does_not_exist = v.get(100);
+```
+
+When the program has a valid reference, the borrow checker enforces the ownership and borrowing rules. You can’t have mutable and immutable references in the same scope.
+
+```rust
+let mut v = vec![1, 2, 3, 4, 5];
+
+let first = &v[0];
+
+v.push(6);
+
+println!("The first element is: {}", first);
+```
+
+`Why should a reference to the first element care about what changes at the end of the vector?`
+This error is due to the way vectors work: adding a new element onto the end of the vector might require allocating new memory and copying the old elements to the new space, if there isn’t enough room to put all the elements next to each other where the vector currently is. In that case, the reference to the first element would be pointing to deallocated memory.
+
+##### Iterating over values of Vector
+
+```rust
+let v = vec![100, 32, 57];
+for i in &v {
+    println!("{}", i);
+}
+```
+
+##### Using an Enum to Store Multiple Types
+
+Fortunately, `the variants of an enum are defined under the same enum type`, so when we need to store elements of a different type in a vector, we can define and use an enum!
+
+```rust
+enum SpreadsheetCell {
+    Int(i32),
+    Float(f64),
+    Text(String),
+}
+
+let row = vec![
+    SpreadsheetCell::Int(3),
+    SpreadsheetCell::Text(String::from("blue")),
+    SpreadsheetCell::Float(10.12),
+];
+```
+
+#### String
+
+#### Hash Maps
