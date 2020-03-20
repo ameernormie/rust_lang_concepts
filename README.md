@@ -55,11 +55,11 @@ let mut ameer =  User {
 ameer.username = String::from("ameernormie");
 ```
 
-##### Create instances from other instances
+#### Create instances from other instances
 
 It’s often useful to create a new instance of a struct that uses most of an old instance’s values but changes some. You’ll do this using struct update syntax.
 
-###### Without update syntax
+##### Without update syntax
 
 ```rust
 let user2 = User {
@@ -70,7 +70,7 @@ let user2 = User {
 };
 ```
 
-###### With update syntax
+##### With update syntax
 
 ```rust
 let user2 = User {
@@ -80,7 +80,7 @@ let user2 = User {
 };
 ```
 
-##### Tuple Structs
+#### Tuple Structs
 
 They are similar to `tuples`. They have the added meaning the struct name provides but don't have names associated with them; rather they just have the types of fields.
 `They are useful when you want to give the whole tuple a name and differentiate them from normal tuples`
@@ -96,15 +96,15 @@ let origin = Point(0, 0, 0);
 A gotcha:
 `In above example,`black`and`origin`are not of the same type. Each struct you define is its own type, even though the fields within the struct have the same types.`
 
-##### Unit like Structs without any fields
+#### Unit like Structs without any fields
 
 You can also define structs that don’t have any fields! These are called unit-like structs because they behave similarly to (), the unit type. Unit-like structs can be useful in situations in which you need to implement a trait on some type but don’t have any data that you want to store in the type itself.
 
-##### Method Syntax
+#### Method Syntax
 
 Methods are similar to functions: they’re declared with the fn keyword and their name, they can have parameters and a return value, and they contain some code that is run when they’re called from somewhere else. However, methods are different from functions in that they’re defined within the context of a struct, and their first parameter is always self, which represents the instance of the struct the method is being called on.
 
-###### Defining methods
+##### Defining methods
 
 To define the function within the context of Rectangle, we start an impl (implementation) block. Then we move the area function within the impl curly brackets and change the first (and in this case, only) parameter to be self in the signature and everywhere within the body. In main, where we called the area function and passed rect1 as an argument, we can instead use method syntax to call the area method on our Rectangle instance.
 
@@ -126,7 +126,7 @@ impl Rectangle {
 }
 ```
 
-###### Associated functions
+##### Associated functions
 
 Another useful feature of impl blocks is that we’re allowed to define functions within impl blocks that don’t take self as a parameter. These are called associated functions because they’re associated with the struct.
 
@@ -142,7 +142,7 @@ impl Rectangle {
 let a_square = Rectangle::square(20);
 ```
 
-##### Ownership of Struct Data
+#### Ownership of Struct Data
 
 It’s possible for structs to store references to data owned by something else, but to do so requires the use of lifetimes, a Rust feature that we’ll discuss later.Lifetimes ensure that the data referenced by a struct is valid for as long as the struct is. Let’s say you try to store a reference in a struct without specifying lifetimes, like this, which won’t work:
 
@@ -168,7 +168,7 @@ fn main() {
 
 `Enums allow you to define a type by enumerating its possible variants.`
 
-###### Defining Enums
+##### Defining Enums
 
 ```rust
 enum IpAddrKind {
@@ -177,7 +177,7 @@ enum IpAddrKind {
 }
 ```
 
-###### Enums Values
+##### Enums Values
 
 ```rust
 enum IpAddrKind {
@@ -219,7 +219,7 @@ let home = IpAddr::V4(127, 0, 0, 1);
 let loopback = IpAddr::V6(String::from("::1"));
 ```
 
-###### We can define methods on enums like structs
+##### We can define methods on enums like structs
 
 ```rust
 enum Message {
@@ -239,7 +239,7 @@ let m = Message::Write(String::from("hello"));
 m.call();
 ```
 
-##### Option Enum
+#### Option Enum
 
 `The Option type is used in many places because it encodes the very common scenario in which a value could be something or it could be nothing. Expressing this concept in terms of the type system means the compiler can check whether you’ve handled all the cases you should be handling; this functionality can prevent bugs that are extremely common in other programming languages.`
 Rust doesn’t have the null feature that many other languages have.
@@ -279,7 +279,7 @@ In other words, you have to convert an `Option<T>` to a `T` before you can perfo
 **Everywhere that a value has a type that isn’t an `Option<T>`, you can safely assume that the value isn’t null.**
 In order to use an `Option<T>` value, you want to have code that will handle each variant. You want some code that will run only when you have a Some(T) value, and this code is allowed to use the inner `T`. You want some other code to run if you have a None value, and that code doesn’t have a `T` value available.
 
-##### `Match` Control flow Operator
+#### `Match` Control flow Operator
 
 Rust has an extremely powerful control flow operator called `match` that allows you to compare a value against a series of patterns and then execute code based on which pattern matches.
 
@@ -303,7 +303,7 @@ fn value_in_cents(coin: Coin) -> u8 {
 
 The code associated with each arm is an expression, and the resulting value of the expression in the matching arm is the value that gets returned for the entire match expression.
 
-###### Patterns that Bind to Values
+##### Patterns that Bind to Values
 
 Another useful feature of match arms is that they can bind to the parts of the values that match the pattern. This is how we can extract values out of enum variants.
 
@@ -335,13 +335,13 @@ fn value_in_cents(coin: Coin) -> u8 {
 }
 ```
 
-###### Matching with `Option`
+##### Matching with `Option`
 
 In the previous section, we wanted to get the inner `T` value out of the Some case when using`Option<T>`; we can also handle`Option<T>` using match as we did with the Coin enum! Instead of comparing coins, we’ll compare the variants of`Option<T>`, but the way that the match expression works remains the same.
 
 Matches in Rust are exhaustive: we must exhaust every last possibility in order for the code to be valid. Especially in the case of `Option<T>`, when Rust prevents us from forgetting to explicitly handle the `None` and `Some` cases.
 
-###### The `_` pattern
+##### The `_` pattern
 
 Rust also has a pattern we can use when we don’t want to list all possible values. For example, a u8 can have valid values of 0 through 255. If we only care about the values 1, 3, 5, and 7, we don’t want to have to list out 0, 2, 4, 6, 8, 9 all the way up to 255. Fortunately, we don’t have to: we can use the special pattern \_ instead:
 
@@ -356,7 +356,7 @@ match some_u8_value {
 }
 ```
 
-##### Concise Control Flow with if let
+#### Concise Control Flow with if let
 
 The `if let` syntax lets you combine if and let into a less verbose way to handle values that match one pattern while ignoring the rest.
 
