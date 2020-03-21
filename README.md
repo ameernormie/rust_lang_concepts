@@ -45,6 +45,9 @@
       - [3.3.4.1 Overwriting a Value](#overwriting-a-value)
       - [3.3.4.2 Only Inserting a Value If the Key Has No Value](#only-inserting-a-value-if-the-key-has-no-value)
       - [3.3.4.3 Updating a Value Based on the Old Value](#updating-a-value-based-on-the-old-value)
+- [4 Error Handling](#error-handling)
+  - [4.1 Unrecoverable Errors](#unrecoverable-errors)
+  - [4.1 Recoverable Errors with `Result`](#recoverable-errors-with-result)
 
 ### Structs
 
