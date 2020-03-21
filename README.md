@@ -500,4 +500,143 @@ let row = vec![
 
 #### String
 
+Rust has only one string type in the core language, which is the string slice `str` that is usually seen in its borrowed form `&str`.
+
+> The String type, which is provided by Rust’s standard library rather than coded into the core language, is a growable, mutable, owned, UTF-8 encoded string type. both String and string slices are `UTF-8` encoded.
+
+##### Creating a new string
+
+```rust
+let mut s = String::new();
+
+let data = "initial contents";
+
+let s = data.to_string();
+
+// the method also works on a literal directly:
+let s = "initial contents".to_string();
+
+let s = String::from("initial contents");
+```
+
+##### Updating a string
+
+A String can grow in size and its contents can change, just like the contents of a `Vec<T>`, if you push more data into it. In addition, you can conveniently use the `+` operator or the `format! macro` to concatenate `String` values.
+
+###### Appending to a string with `push_str` and `push`
+
+```rust
+let mut s = String::from("foo");
+s.push_str("bar");
+
+// s will now be foobar
+
+let mut s = String::from("lo");
+s.push('l');
+```
+
+`
+
+###### Concatenation with the `+` Operator or the format`! Macro
+
+```rust
+let s1 = String::from("Hello, ");
+let s2 = String::from("world!");
+let s3 = s1 + &s2; // note s1 has been moved here and can no longer be used
+```
+
+The reason `s1` is no longer valid after the addition and the reason we used a reference to `s2` has to do with the signature of the method that gets called when we use the `+` operator. The `+` operator uses the add method, whose signature looks something like this:
+`fn add(self, s: &str) -> String {`
+
+We can see in the signature that add takes ownership of self, because self does not have an &. This means s1 in Listing 8-18 will be moved into the add call and no longer be valid after that. So although let s3 = s1 + &s2; looks like it will copy both strings and create a new one, this statement actually takes ownership of s1, appends a copy of the contents of s2, and then returns ownership of the result. In other words, it looks like it’s making a lot of copies but isn’t; the implementation is more efficient than copying.
+
+```rust
+let s1 = String::from("tic");
+let s2 = String::from("tac");
+let s3 = String::from("toe");
+
+let s = s1 + "-" + &s2 + "-" + &s3;
+```
+
+For more complicated string combining, we can use the `format!` macro:
+
+##### Indexing into strings
+
+In many other programming languages, accessing individual characters in a string by referencing them by index is a valid and common operation. However, if you try to access parts of a String using indexing syntax in Rust, you’ll get an error.
+
+```rust
+// This is invalid code
+let s1 = String::from("hello");
+let h = s1[0];
+```
+
+###### Internal Representation
+
+**A String is a wrapper over a Vec<u8>.**
+
+```rust
+let len = String::from("Hola").len(); // 4
+let len = String::from("Здравствуйте").len();  // 24
+```
+
+`len` returns the number of `bytes` it takes to encode a string.
+
+```rust
+let hello = "Здравствуйте";
+let answer = &hello[0];
+```
+
+What should the value of answer be? Should it be `З`, the first letter? When encoded in `UTF-8`, the first byte of `З` is `208` and the second is `151`, so answer should in fact be `208`, but `208` is not a valid character on its own. Returning `208` is likely not what a user would want if they asked for the first letter of this string; however, that’s the only data that Rust has at byte index `0`. Users generally don’t want the byte value returned, even if the string contains only Latin letters: if `&"hello"[0]` were valid code that returned the byte value, it would return `104`, not `h`. To avoid returning an unexpected value and causing bugs that might not be discovered immediately, Rust doesn’t compile this code at all and prevents misunderstandings early in the development process.
+
+###### Bytes and Scalar Values and Grapheme Clusters!
+
+Another point about UTF-8 is that there are actually three relevant ways to look at strings from Rust’s perspective:
+
+1. Bytes
+2. Scalar values
+3. Grapheme clusters (closest thing to a letter)
+
+If we look at the Hindi word `नमस्ते` written in the Devanagari script, it is stored as a vector of u8 values that looks like this:
+
+```rust
+// That’s 18 bytes and is how computers ultimately store this data.
+[224, 164, 168, 224, 164, 174, 224, 164, 184, 224, 165, 141, 224, 164, 164,
+224, 165, 135]
+
+// If we look at them as Unicode scalar values, which are what Rust’s char type
+['न', 'म', 'स', '्', 'त', 'े']
+
+// Finally, if we look at them as grapheme clusters, we’d get what a person would call the four letters
+["न", "म", "स्", "ते"]
+```
+
+##### Slicing Strings
+
+Indexing into a string is often a bad idea because it’s not clear what the return type of the string-indexing operation should be: a `byte` value, a `character`, a `grapheme` cluster, or a `string slice`. To be more specific in your indexing and indicate that you want a `string slice`.
+
+```rust
+let hello = "Здравствуйте";
+
+let s = &hello[0..4];
+```
+
+Here, `s` will be a `&str` that contains the first `4 bytes` of the string. Earlier, we mentioned that each of these characters was `2 bytes`, which means `s` will be `Зд`.
+
+What would happen if we used `&hello[0..1]`? The answer: Rust would panic at runtime in the same way as if an invalid index were accessed in a vector:
+
+##### Methods for Iterating Over Strings
+
+If you need to perform operations on individual Unicode scalar values, the best way to do so is to use the chars method. Calling chars on `नमस्ते` separates out and returns six values of type char, and you can iterate over the result to access each element:
+
+```rust
+for c in "नमस्ते".chars() {
+    println!("{}", c);
+}
+
+
+for b in "नमस्ते".bytes() {
+    println!("{}", b);
+}
+```
+
 #### Hash Maps

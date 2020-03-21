@@ -107,6 +107,21 @@ fn main() {
     }
 
     println!("vector v mutating each value a value is {:?}", v);
+
+    println!("\n******************Strings*******************\n");
+    let mut name = String::from("ameer");
+    let last_name = " hamza";
+    name.push_str(last_name);
+
+    println!("My name is {} after using push_str method", name);
+
+    for c in "नमस्ते".chars() {
+        println!("iterating over string नमस्ते in char   {}", c);
+    }
+
+    for b in "नमस्ते".bytes() {
+        println!("iterating over string नमस्ते in bytes   {}", b);
+    }
 }
 
 fn value_in_cents(coin: Coin) -> u8 {
