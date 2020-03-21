@@ -1,6 +1,7 @@
 mod structs;
 use crate::structs::rectangle;
 use crate::structs::user_struct;
+use std::collections::HashMap;
 
 #[allow(unused_variables)]
 #[allow(dead_code)]
@@ -122,6 +123,41 @@ fn main() {
     for b in "नमस्ते".bytes() {
         println!("iterating over string नमस्ते in bytes   {}", b);
     }
+
+    println!("\n******************Hash Maps*******************\n");
+    let mut scores = HashMap::new();
+
+    scores.insert(String::from("Blue"), 10);
+    scores.insert(String::from("Green"), 50);
+    // Only Inserting a Value If the Key Has No Value
+    scores.entry(String::from("Red")).or_insert(100);
+
+    println!("hashmap scores {:?}", scores);
+
+    let teams = vec![String::from("Blue"), String::from("Yellow")];
+    let initial_scores = vec![10, 50];
+
+    let new_scores: HashMap<_, _> = teams.iter().zip(initial_scores.iter()).collect();
+
+    println!("hashmap new scores {:?}", new_scores);
+
+    let team_name = String::from("Blue");
+
+    println!(
+        "get the score of Blue team {:?}",
+        new_scores.get(&team_name)
+    );
+
+    let text = "hello world wonderful world";
+
+    let mut map = HashMap::new();
+
+    for word in text.split_whitespace() {
+        let count = map.entry(word).or_insert(0);
+        *count += 1;
+    }
+
+    println!("{:?}", map);
 }
 
 fn value_in_cents(coin: Coin) -> u8 {
