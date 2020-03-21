@@ -38,6 +38,13 @@
     - [3.2.4 Slicing Strings](#slicing-strings)
     - [3.2.5 Methods for Iterating Over Strings](#methods-for-iterating-over-strings)
   - [3.3 Hash Maps](#hash-maps)
+    - [3.3.1 Creating a new hash map](#creating-a-new-hash-map)
+    - [3.3.2 Hash Maps and Ownership](#hash-maps-and-ownership)
+    - [3.3.3 Accessing Values in a Hash Map](#accessing-values-in-a-hash-map)
+    - [3.3.4 Updating a Hash Map](#updating-a-hash-map)
+      - [3.3.4.1 Overwriting a Value](#overwriting-a-value)
+      - [3.3.4.2 Only Inserting a Value If the Key Has No Value](#only-inserting-a-value-if-the-key-has-no-value)
+      - [3.3.4.3 Updating a Value Based on the Old Value](#updating-a-value-based-on-the-old-value)
 
 ### Structs
 
