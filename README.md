@@ -28,6 +28,15 @@
     - [3.1.4 Iterating over values of Vector](#iterating-over-values-of-vector)
     - [3.1.5 Using an Enum to Store Multiple Types](#using-an-enum-to-store-multiple-types)
   - [3.2 String](#string)
+    - [3.2.1 Creating a new string](#creating-a-new-string)
+    - [3.2.2 Updating a string](#updating-a-string)
+      - [3.2.2.1 Appending to a string with `push_str` and `push`](#appending-to-a-string-with-push_str-and-push)
+      - [3.2.2.2 Concatenation with the `+` Operator or the format` Macro](#concatenation-with-the-plus-operator-or-the-format-macro)
+    - [3.2.3 Indexing into strings](#indexing-into-strings)
+      - [3.2.3.1 Internal Representation](#internal-representation)
+      - [3.2.3.2 Bytes and Scalar Values and Grapheme Clusters](#bytes-and-scalar-values-and-grapheme-clusters)
+    - [3.2.4 Slicing Strings](#slicing-strings)
+    - [3.2.5 Methods for Iterating Over Strings](#methods-for-iterating-over-strings)
   - [3.3 Hash Maps](#hash-maps)
 
 ### Structs
@@ -537,7 +546,7 @@ s.push('l');
 
 `
 
-###### Concatenation with the `+` Operator or the format`! Macro
+###### Concatenation with the `plus` Operator or the format Macro
 
 ```rust
 let s1 = String::from("Hello, ");
@@ -588,7 +597,7 @@ let answer = &hello[0];
 
 What should the value of answer be? Should it be `З`, the first letter? When encoded in `UTF-8`, the first byte of `З` is `208` and the second is `151`, so answer should in fact be `208`, but `208` is not a valid character on its own. Returning `208` is likely not what a user would want if they asked for the first letter of this string; however, that’s the only data that Rust has at byte index `0`. Users generally don’t want the byte value returned, even if the string contains only Latin letters: if `&"hello"[0]` were valid code that returned the byte value, it would return `104`, not `h`. To avoid returning an unexpected value and causing bugs that might not be discovered immediately, Rust doesn’t compile this code at all and prevents misunderstandings early in the development process.
 
-###### Bytes and Scalar Values and Grapheme Clusters!
+###### Bytes and Scalar Values and Grapheme Clusters
 
 Another point about UTF-8 is that there are actually three relevant ways to look at strings from Rust’s perspective:
 
