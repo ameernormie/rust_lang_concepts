@@ -2,6 +2,9 @@ mod structs;
 use crate::structs::rectangle;
 use crate::structs::user_struct;
 use std::collections::HashMap;
+use std::fs::File;
+use std::io;
+use std::io::Read;
 
 #[allow(unused_variables)]
 #[allow(dead_code)]
@@ -158,6 +161,33 @@ fn main() {
     }
 
     println!("{:?}", map);
+
+    println!("\n\n\n******************Error Handling*******************\n");
+    let read_from_file_result = read_username_from_file();
+
+    match read_from_file_result {
+        Ok(res) => println!("the result is {}", res),
+        Err(e) => println!("error while reading hello.txt {}", e),
+    }
+
+    let read_from_file_using_question_operator_result =
+        read_username_from_file_using_question_operator();
+
+    match read_from_file_using_question_operator_result {
+        Ok(res) => println!("the result using ? operator {}", res),
+        Err(e) => println!("error while reading hello.txt using ? operator {}", e),
+    }
+
+    let read_from_file_using_question_operator_improved_result =
+        read_username_from_file_using_question_operator_improved();
+
+    match read_from_file_using_question_operator_improved_result {
+        Ok(res) => println!("the result using ? operator improved {}", res),
+        Err(e) => println!(
+            "error while reading hello.txt using ? operator improved {}",
+            e
+        ),
+    }
 }
 
 fn value_in_cents(coin: Coin) -> u8 {
@@ -177,4 +207,37 @@ fn plus_one(x: Option<i32>) -> Option<i32> {
         None => None,
         Some(x) => Some(x + 1),
     }
+}
+
+fn read_username_from_file() -> Result<String, io::Error> {
+    let f = File::open("hello.txt");
+
+    let mut f = match f {
+        Ok(file) => file,
+        Err(e) => return Err(e),
+    };
+
+    let mut s = String::new();
+
+    match f.read_to_string(&mut s) {
+        Ok(_) => Ok(s),
+        Err(e) => Err(e),
+    }
+}
+
+fn read_username_from_file_using_question_operator() -> Result<String, io::Error> {
+    let mut f = File::open("hello.txt")?;
+
+    let mut s = String::new();
+
+    f.read_to_string(&mut s)?;
+    Ok(s)
+}
+
+fn read_username_from_file_using_question_operator_improved() -> Result<String, io::Error> {
+    let mut s = String::new();
+
+    File::open("hello.txt")?.read_to_string(&mut s)?;
+
+    Ok(s)
 }
