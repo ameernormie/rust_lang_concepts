@@ -49,6 +49,12 @@
   - [4.1 Unrecoverable Errors](#unrecoverable-errors)
   - [4.1 Recoverable Errors with `Result`](#recoverable-errors-with-result)
 - [5 Generic Types, Traits and Lifetimes](#generic-types-traits-and-lifetimes)
+  - [5.1 Generics](#generics)
+    - [5.1.1 Function definitions](#function-definitions)
+    - [5.1.2 In Struct Definitions](#in-struct-definitions)
+    - [5.1.3 In Enum Definitions](#in-enum-definitions)
+    - [5.1.4 In Method Definitions](#in-method-definitions)
+    - [5.1.5 Performance of Code Using Generics](#performance-of-code-using-generics)
 
 ### Structs
 
