@@ -48,6 +48,7 @@
 - [4 Error Handling](#error-handling)
   - [4.1 Unrecoverable Errors](#unrecoverable-errors)
   - [4.1 Recoverable Errors with `Result`](#recoverable-errors-with-result)
+- [5 Generic Types, Traits and Lifetimes](#generic-types-traits-and-lifetimes)
 
 ### Structs
 
@@ -945,3 +946,113 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 ```
+
+### Generic Types, Traits and Lifetimes
+
+#### Generics
+
+> We can use generics to create definitions for items like function signatures or structs, which we can then use with many different concrete data types.
+
+##### Function definitions
+
+When defining a function that uses generics, we place the generics in the signature of the function where we would usually specify the data types of the parameters and return value.
+
+`Same function with two different definitions because of different types`
+
+```rust
+fn largest_i32(list: &[i32]) -> i32 {
+    let mut largest = list[0];
+
+    for &item in list.iter() {
+        if item > largest {
+            largest = item;
+        }
+    }
+
+    largest
+}
+
+fn largest_char(list: &[char]) -> char {
+    let mut largest = list[0];
+
+    for &item in list.iter() {
+        if item > largest {
+            largest = item;
+        }
+    }
+
+    largest
+}
+
+```
+
+To parameterize the types in the new function we’ll define, we need to name the type parameter, just as we do for the value parameters to a function. You can use any identifier as a type parameter name. But we’ll use T because, by convention.
+
+When we use a parameter in the body of the function, we have to declare the parameter name in the signature so the compiler knows what that name means. Similarly, when we use a type parameter name in a function signature, we have to declare the type parameter name before we use it. To define the generic largest function, place type name declarations inside angle brackets, `<>`, between the name of the function and the parameter list, like this: `fn largest<T>(list: &[T]) -> T {`
+
+> We read this definition as: the function largest is generic over some type T. This function has one parameter named list, which is a slice of values of type T. The largest function will return a value of the same type T.
+
+```rust
+fn largest<T>(list: &[T]) -> T {
+let mut largest = list[0];
+
+    for &item in list.iter() {
+        if item > largest {
+            largest = item;
+        }
+    }
+
+    largest
+
+}
+```
+
+The above code doesn't work because it gives the error that `>` operation doesn't work for all types. To solve this issue, we'll use `traits`. We'll learn about traits a bit later.
+
+##### In Struct Definitions
+
+We can also define structs to use a generic type parameter in one or more fields using the <> syntax.
+
+```rust
+struct Point<T, U> {
+    x: T,
+    y: U,
+}
+
+fn main() {
+    let integer = Point { x: 5, y: 10 };
+    let float = Point { x: 1.0, y: 4.0 };
+}
+```
+
+##### In Enum Definitions
+
+```rust
+enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+```
+
+##### In Method Definitions
+
+```rust
+struct Point<T> {
+    x: T,
+    y: T,
+}
+
+impl<T> Point<T> {
+    fn x(&self) -> &T {
+        &self.x
+    }
+}
+```
+
+##### Performance of Code Using Generics
+
+> Rust implements generics in such a way that your code doesn’t run any slower using generic types than it would with concrete types.
+
+Rust accomplishes this by performing monomorphization of the code that is using generics at compile time. `Monomorphization is the process of turning generic code into specific code by filling in the concrete types that are used when compiled.`
+
+The compiler looks at all the places where generic code is called and generates code for the concrete types the generic code is called with. Because Rust compiles generic code into code that specifies the type in each instance, we pay no runtime cost for using generics. When the code runs, it performs just as it would if we had duplicated each definition by hand. The process of monomorphization makes Rust’s generics extremely efficient at runtime.
