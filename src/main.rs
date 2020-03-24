@@ -1,6 +1,6 @@
-mod generics;
+mod generics_traits_lifetimes;
 mod structs;
-use crate::generics as Generics;
+use crate::generics_traits_lifetimes::generics as Generics;
 use crate::structs::rectangle;
 use crate::structs::user_struct;
 use std::collections::HashMap;
@@ -195,8 +195,8 @@ fn main() {
     // let num_list = vec![1, 2, 3, 4, 5, 6];
     // let largest = Generics::generics::largest(&num_list);
 
-    let p1 = Generics::generics::Point { x: 4, y: 3.9 };
-    let p2 = Generics::generics::Point { x: "Hello", y: 'c' };
+    let p1 = Generics::Point { x: 4, y: 3.9 };
+    let p2 = Generics::Point { x: "Hello", y: 'c' };
     println!("two points using generic structs {:?}", p1);
     println!("x of point {}", p1.x());
     println!("y of point {}", p1.y());
