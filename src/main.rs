@@ -1,6 +1,8 @@
 mod generics_traits_lifetimes;
 mod structs;
 use crate::generics_traits_lifetimes::generics as Generics;
+use crate::generics_traits_lifetimes::traits as Traits;
+use crate::generics_traits_lifetimes::traits::Summary;
 use crate::structs::rectangle;
 use crate::structs::user_struct;
 use std::collections::HashMap;
@@ -192,6 +194,7 @@ fn main() {
     }
 
     println!("\n\n\n******************Generics, Traits and Lifetimes*******************\n");
+    println!("\n******************Generics*******************\n");
     // let num_list = vec![1, 2, 3, 4, 5, 6];
     // let largest = Generics::generics::largest(&num_list);
 
@@ -204,6 +207,27 @@ fn main() {
     let p3 = p1.mixup(p2);
 
     println!("p3.x = {} and p3.y = {}", p3.x, p3.y);
+
+    println!("\n******************Traits*******************\n");
+    let tweet = Traits::Tweet {
+        username: String::from("horse_ebooks"),
+        content: String::from("of course, as you probably already know, people"),
+        reply: false,
+        retweet: false,
+    };
+
+    println!("1 new tweet: {}", tweet.summarize());
+
+    let news_article = Traits::NewsArticle {
+        headline: String::from("Florida man does something"),
+        location: String::from("Florida"),
+        author: String::from("A florida man"),
+        content: String::from(
+            "Florida man does something and you know what a florida man does; everything",
+        ),
+    };
+
+    println!("summary of article is: {}", news_article.summarize());
 }
 
 fn value_in_cents(coin: Coin) -> u8 {
