@@ -216,7 +216,7 @@ fn main() {
         retweet: false,
     };
 
-    println!("1 new tweet: {}", tweet.summarize());
+    notify(tweet);
 
     let news_article = Traits::NewsArticle {
         headline: String::from("Florida man does something"),
@@ -227,7 +227,10 @@ fn main() {
         ),
     };
 
-    println!("summary of article is: {}", news_article.summarize());
+    notify(news_article);
+
+    let tweet2 = returns_summarizable();
+    notify(tweet2);
 }
 
 fn value_in_cents(coin: Coin) -> u8 {
@@ -280,4 +283,20 @@ fn read_username_from_file_using_question_operator_improved() -> Result<String, 
     File::open("hello.txt")?.read_to_string(&mut s)?;
 
     Ok(s)
+}
+
+// Traits as parameters
+// functions that accept many different types.
+fn notify(item: impl Summary) {
+    println!("Traits as parameters: Breaking news! {}", item.summarize())
+}
+
+// Returning Types that implement traits
+fn returns_summarizable() -> impl Summary {
+    Traits::Tweet {
+        username: String::from("horse_ebooks"),
+        content: String::from("of course, as you probably already know, people"),
+        reply: false,
+        retweet: false,
+    }
 }
