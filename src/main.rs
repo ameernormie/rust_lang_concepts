@@ -195,8 +195,13 @@ fn main() {
 
     println!("\n\n\n******************Generics, Traits and Lifetimes*******************\n");
     println!("\n******************Generics*******************\n");
-    // let num_list = vec![1, 2, 3, 4, 5, 6];
-    // let largest = Generics::generics::largest(&num_list);
+    let num_list = vec![1, 2, 3, 4, 5, 6];
+    let largest = Generics::largest(&num_list);
+
+    println!(
+        "Largest value using generic function in list [1, 2, 3, 4, 5, 6] is {}",
+        largest
+    );
 
     let p1 = Generics::Point { x: 4, y: 3.9 };
     let p2 = Generics::Point { x: "Hello", y: 'c' };

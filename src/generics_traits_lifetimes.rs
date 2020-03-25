@@ -1,15 +1,15 @@
 pub mod generics {
-    // pub fn largest<T>(list: &[T]) -> T {
-    //     let mut largest = list[0];
+    pub fn largest<T: PartialOrd + Copy>(list: &[T]) -> T {
+        let mut largest = list[0];
 
-    //     for &item in list.iter() {
-    //         if item > largest {
-    //             largest = item;
-    //         }
-    //     }
+        for &item in list.iter() {
+            if item > largest {
+                largest = item;
+            }
+        }
 
-    //     largest
-    // }
+        largest
+    }
 
     // This allows us to use two different types in struct
     #[derive(Debug)]
