@@ -56,6 +56,15 @@
     - [5.1.4 In Method Definitions](#in-method-definitions)
     - [5.1.5 Performance of Code Using Generics](#performance-of-code-using-generics)
   - [5.2 Traits](#traits)
+    - [5.2.1 Defining trait](#defining-trait)
+    - [5.2.2 Implementing a Trait on a Type](#implementing-a-trait-on-a-type)
+    - [5.2.3 Default implementations](#default-implementations)
+    - [5.2.4 Traits as Parameters](#traits-as-parameters)
+      - [5.2.4.1 Trait Bound Syntax](#trait-bound-syntax)
+      - [5.2.4.2 Specifying Multiple Trait Bounds with the plus syntax](#specifying-multiple-trait-bounds-with-the-plus-syntax)
+      - [5.2.4.3 Clearer Trait Bounds with `where` Clauses](#clearer-trait-bounds-with-where-clauses)
+    - [5.2.5 Returning Types that Implement Traits](#returning-types-that-implement-traits)
+    - [5.2.6 Using Trait Bounds to Conditionally Implement Methods](#using-trait-bounds-to-conditionally-implement-methods)
 
 ### Structs
 
@@ -1215,4 +1224,42 @@ fn returns_summarizable() -> impl Summary {
 
 > By using `impl Summary` for the return type, we specify that the `returns_summarizable` function returns some type that implements the Summary trait without naming the concrete type. In this case, `returns_summarizable` returns a `Tweet`, but the code calling this function doesn’t know that.
 
-##### Fixing the `largest` Function with Trait Bounds
+##### Using Trait Bounds to Conditionally Implement Methods
+
+By using a trait bound with an impl block that uses generic type parameters, we can implement methods conditionally for types that implement the specified traits. For example, the type `Pair<T>` in below example always implements the `new` function. But `Pair<T>` only implements the cmp_display method if its inner type T implements the PartialOrd trait that enables comparison and the Display trait that enables printing.
+
+```rust
+use std::fmt::Display;
+
+struct Pair<T> {
+    x: T,
+    y: T,
+}
+
+impl<T> Pair<T> {
+    fn new(x: T, y: T) -> Self {
+        Self {
+            x,
+            y,
+        }
+    }
+}
+
+impl<T: Display + PartialOrd> Pair<T> {
+    fn cmp_display(&self) {
+        if self.x >= self.y {
+            println!("The largest member is x = {}", self.x);
+        } else {
+            println!("The largest member is y = {}", self.y);
+        }
+    }
+}
+```
+
+We can also conditionally implement a trait for any type that implements another trait. **Implementations of a trait on any type that satisfies the trait bounds are called blanket implementations** and are extensively used in the Rust standard library. For example, the standard library implements the `ToString` trait on any type that implements the `Display` trait. The `impl` block in the standard library looks similar to this code:
+
+```rust
+impl<T: Display> ToString for T {
+    // --snip--
+}
+```
