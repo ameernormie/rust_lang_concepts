@@ -1119,3 +1119,100 @@ println!("1 new tweet: {}", tweet.summarize());
 Note that because we defined the Summary trait and the NewsArticle and Tweet types in the same lib.rs in above example, they’re all in the same scope. Let’s say this `lib.rs` is for a crate we’ve called `aggregator` and someone else wants to use our crate’s functionality to implement the `Summary` trait on a struct defined within their library’s scope. They would need to bring the trait into their scope first. They would do so by specifying `use aggregator::Summary;`, which then would enable them to implement Summary for their type. The Summary trait would also need to be a public trait for another crate to implement it, which it is because we put the `pub` keyword before trait in Listing
 
 > One restriction to note with trait implementations is that `we can implement a trait on a type only if either the trait or the type is local to our crate`. For example, we can implement standard library traits like `Display` on a custom type like `Tweet` as part of our `aggregator` crate functionality, because the type `Tweet` is local to our `aggregator` crate. We can also implement `Summary` on `Vec<T>` in our aggregator crate, because the trait `Summary` is local to our `aggregator` crate. But we can’t implement external traits on external types. For example, we can’t implement the `Display` trait on `Vec<T>` within our `aggregator` crate, because `Display` and `Vec<T>` are defined in the standard library and aren’t local to our `aggregator` crate. This restriction is part of a property of programs called `coherence`, and more specifically the `orphan rule`, so named because the parent type is not present. This rule ensures that other people’s code can’t break your code and vice versa. Without the rule, two crates could implement the same trait for the same type, and Rust wouldn’t know which implementation to use.
+
+##### Default implementations
+
+> Sometimes it’s useful to have default behavior for some or all of the methods in a trait instead of requiring implementations for all methods on every type. Then, as we implement the trait on a particular type, we can keep or override each method’s default behavior.
+
+```rust
+pub trait Summary {
+    fn summarize(&self) -> String {
+        String::from("(Read more...)")
+    }
+}
+```
+
+To use a default implementation to summarize instances of `NewsArticle` instead of defining a custom implementation, we specify an empty impl block with `impl Summary for NewsArticle {}`.
+Default implementations can call other methods in the same trait, even if those other methods don’t have a default implementation. In this way, a trait can provide a lot of useful functionality and only require implementors to specify a small part of it.
+
+```rust
+pub trait Summary {
+    fn summarize_author(&self) -> String;
+
+    fn summarize(&self) -> String {
+        format!("(Read more from {}...)", self.summarize_author())
+    }
+}
+```
+
+##### Traits as Parameters
+
+Define functions that accept many different types.
+
+```rust
+pub fn notify(item: impl Summary) {
+    println!("Breaking news! {}", item.summarize());
+}
+```
+
+Instead of a concrete type for the `item` parameter, we specify the `impl` keyword and the trait name. This parameter accepts any type that implements the specified trait. In the body of notify, we can call any methods on item that come from the `Summary` trait, such as `summarize`. We can call `notify` and pass in any instance of `NewsArticle` or `Tweet`.
+
+###### Trait Bound Syntax
+
+The `impl Trait` syntax works for straightforward cases but is actually syntax sugar for a longer form, which is called a trait bound; it looks like this:
+
+```rust
+pub fn notify<T: Summary>(item: T) {
+    println!("Breaking news! {}", item.summarize());
+}
+
+// More complexity with two parameteres that implement Summary
+pub fn notify(item1: impl Summary, item2: impl Summary) {
+
+// If we wanted to force both parameters to have the same type, that’s only possible to express using a trait bound, like this:
+pub fn notify<T: Summary>(item1: T, item2: T) {
+```
+
+###### Specifying Multiple Trait Bounds with the plus syntax
+
+We can also specify more than one trait bound. Say we wanted `notify` to use `display` formatting on item as well as the `summarize` method: we specify in the `notify` definition that item must implement both `Display` and `Summary`. We can do so using the `+` syntax:
+
+```rust
+pub fn notify(item: impl Summary + Display) {}
+
+pub fn notify<T: Summary + Display>(item: T) {}
+```
+
+###### Clearer Trait Bounds with `where` Clauses
+
+Using too many trait bounds has its downsides. Each generic has its own trait bounds, so functions with multiple generic type parameters can contain lots of trait bound information between the function’s name and its parameter list, making the function signature hard to read. For this reason, Rust has alternate syntax for specifying trait bounds inside a `where` clause after the function signature.
+
+```rust
+// Instead of writing this
+fn some_function<T: Display + Clone, U: Clone + Debug>(t: T, u: U) -> i32 {
+
+// Write this
+fn some_function<T, U>(t: T, u: U) -> i32
+    where T: Display + Clone,
+          U: Clone + Debug
+{}
+```
+
+##### Returning Types that Implement Traits
+
+We can also use the `impl Trait` syntax in the return position to return a value of some type that implements a trait, as shown here:
+
+```rust
+fn returns_summarizable() -> impl Summary {
+    Tweet {
+        username: String::from("horse_ebooks"),
+        content: String::from("of course, as you probably already know, people"),
+        reply: false,
+        retweet: false,
+    }
+}
+```
+
+> By using `impl Summary` for the return type, we specify that the `returns_summarizable` function returns some type that implements the Summary trait without naming the concrete type. In this case, `returns_summarizable` returns a `Tweet`, but the code calling this function doesn’t know that.
+
+##### Fixing the `largest` Function with Trait Bounds
