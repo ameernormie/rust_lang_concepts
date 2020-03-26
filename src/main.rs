@@ -236,6 +236,14 @@ fn main() {
 
     let tweet2 = returns_summarizable();
     notify(tweet2);
+
+    println!("\n******************Lifetimes (Validating references)*******************\n");
+
+    let string1 = String::from("abcd");
+    let string2 = "xyz";
+
+    let longest_string = longest_of_two_strings(string1.as_str(), string2);
+    println!("longest of two strings is {}", longest_string);
 }
 
 fn value_in_cents(coin: Coin) -> u8 {
@@ -303,5 +311,13 @@ fn returns_summarizable() -> impl Summary {
         content: String::from("of course, as you probably already know, people"),
         reply: false,
         retweet: false,
+    }
+}
+
+fn longest_of_two_strings<'a>(x: &'a str, y: &'a str) -> &'a str {
+    if x.len() > y.len() {
+        x
+    } else {
+        y
     }
 }
