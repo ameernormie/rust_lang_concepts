@@ -1,16 +1,18 @@
+mod closures;
 mod generics_traits_lifetimes;
 mod structs;
+
+use std::collections::HashMap;
+use std::fs::File;
+use std::io;
+use std::io::Read;
+
+use crate::closures as ClosureModule;
 use crate::generics_traits_lifetimes::generics as Generics;
 use crate::generics_traits_lifetimes::traits as Traits;
 use crate::generics_traits_lifetimes::traits::Summary;
 use crate::structs::rectangle;
 use crate::structs::user_struct;
-use std::collections::HashMap;
-use std::fs::File;
-use std::io;
-use std::io::Read;
-use std::thread;
-use std::time::Duration;
 
 #[allow(unused_variables)]
 #[allow(dead_code)]
@@ -254,7 +256,7 @@ fn main() {
     let simulated_user_specified_value = 10;
     let simulated_random_number = 7;
 
-    generate_workout(simulated_user_specified_value, simulated_random_number)
+    ClosureModule::generate_workout(simulated_user_specified_value, simulated_random_number)
 }
 
 fn value_in_cents(coin: Coin) -> u8 {
@@ -330,26 +332,5 @@ fn longest_of_two_strings<'a>(x: &'a str, y: &'a str) -> &'a str {
         x
     } else {
         y
-    }
-}
-
-// Closure example
-fn generate_workout(intensity: u32, random_number: u32) {
-    let expensive_closure = |num| {
-        println!("Calculating slowly...");
-        thread::sleep(Duration::from_secs(2));
-        num
-    };
-
-    if intensity < 25 {
-        let get_closure_value_in_one_variable = expensive_closure(intensity);
-        println!("Today, do {} pushups!", get_closure_value_in_one_variable);
-        println!("Next, do {} situps!", get_closure_value_in_one_variable);
-    } else {
-        if random_number == 3 {
-            println!("Take a break today! Remember to stay hydrated!");
-        } else {
-            println!("Today, run for {} minutes!", expensive_closure(intensity));
-        }
     }
 }
