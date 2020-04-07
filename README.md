@@ -1651,3 +1651,155 @@ let n = example_closure(5);
 ```
 
 `The first time we call example_closure with the String value, the compiler infers the type of x and the return type of the closure to be String. Those types are then locked in to the closure in example_closure, and we get a type error if we try to use a different type with the same closure.`
+
+##### Storing Closures Using Generic Parameters and the `Fn` Traits
+
+We can create a struct that will hold the closure and the resulting value of calling the closure. The struct will execute the closure only if we need the resulting value, and it will cache the resulting value so the rest of our code doesn’t have to be responsible for saving and reusing the result. You may know this pattern as `memoization` or `lazy evaluation`.
+
+To make a struct that holds a closure, we need to specify the type of the closure, because a struct definition needs to know the types of each of its fields. `Each closure instance has its own unique anonymous type: that is, even if two closures have the same signature, their types are still considered different`. To define structs, enums, or function parameters that use closures, we use generics and trait bounds.
+
+The `Fn` traits are provided by the standard library. All closures implement at least one of the traits: `Fn`, `FnMut`, or `FnOnce`.
+
+We add types to the `Fn` trait bound to represent the types of the parameters and return values the closures must have to match this trait bound. In this case, our closure has a parameter of type `u32` and returns a `u32`, so the trait bound we specify is `Fn(u32) -> u32`.
+
+```rust
+struct Cacher<T>
+    where T: Fn(u32) -> u32
+{
+    calculation: T,
+    value: Option<u32>,
+}
+```
+
+The `Cacher` struct has a calculation field of the generic type `T`. The trait bounds on `T` specify that it’s a closure by using the `Fn` trait. Any closure we want to store in the calculation field must have one `u32` parameter (specified within the parentheses after `Fn`) and must return a `u32` (specified after the `->`).
+
+> Note: Functions can implement all three of the Fn traits too. If what we want to do doesn’t require capturing a value from the environment, we can use a function rather than a closure where we need something that implements an Fn trait.
+
+The `value` field is of type `Option<u32>`. Before we execute the closure, `value` will be `None`. When code using a `Cacher` asks for the result of the closure, the `Cacher` will execute the closure at that time and store the result within a `Some` variant in the `value` field. Then if the code asks for the result of the closure again, instead of executing the closure again, the `Cacher` will return the result held in the `Some` variant.
+
+```rust
+struct Cacher<T>
+    where T: Fn(u32) -> u32
+{
+    calculation: T,
+    value: Option<u32>,
+}
+
+impl<T> Cacher<T>
+    where T: Fn(u32) -> u32
+{
+    fn new(calculation: T) -> Cacher<T> {
+        Cacher {
+            calculation,
+            value: None,
+        }
+    }
+
+    fn value(&mut self, arg: u32) -> u32 {
+        match self.value {
+            Some(v) => v,
+            None => {
+                let v = (self.calculation)(arg);
+                self.value = Some(v);
+                v
+            },
+        }
+    }
+}
+
+fn generate_workout(intensity: u32, random_number: u32) {
+    let mut expensive_result = Cacher::new(|num| {
+        println!("calculating slowly...");
+        thread::sleep(Duration::from_secs(2));
+        num
+    });
+
+    if intensity < 25 {
+        println!(
+            "Today, do {} pushups!",
+            expensive_result.value(intensity)
+        );
+        println!(
+            "Next, do {} situps!",
+            expensive_result.value(intensity)
+        );
+    } else {
+        if random_number == 3 {
+            println!("Take a break today! Remember to stay hydrated!");
+        } else {
+            println!(
+                "Today, run for {} minutes!",
+                expensive_result.value(intensity)
+            );
+        }
+    }
+}
+```
+
+Instead of saving the closure in a variable directly, we save a new instance of `Cacher` that holds the closure. Then, in each place we want the result, we call the `value` method on the `Cacher` instance. We can call the `value` method as many times as we want, or not call it at all, and the expensive calculation will be run a maximum of once.
+
+##### Limitations of the `Cacher` Implementation
+
+The first problem is that a `Cacher` instance assumes it will always get the same value for the parameter `arg` to the `value` method. That is, this test of `Cacher` will fail:
+
+```rust
+#[test]
+fn call_with_different_values() {
+    let mut c = Cacher::new(|a| a);
+
+    let v1 = c.value(1);
+    let v2 = c.value(2);
+
+    assert_eq!(v2, 2);
+}
+```
+
+The second problem with the current `Cacher` implementation is that it only accepts closures that take one parameter of type `u32` and return a `u32`. We might want to cache the results of closures that take a `string slice` and return `usize` values, for example. To fix this issue, try introducing more generic parameters to increase the flexibility of the Cacher functionality.
+
+##### Capturing the Environment with Closures
+
+Closures have an additional capability that functions don’t have: they can capture their environment and access variables from the scope in which they’re defined.
+
+```rust
+fn main() {
+    let x = 4;
+
+    let equal_to_x = |z| z == x;
+
+    let y = 4;
+
+    assert!(equal_to_x(y));
+}
+```
+
+When a closure captures a value from its environment, it uses memory to store the values for use in the closure body. This use of memory is overhead that we don’t want to pay in more common cases where we want to execute code that doesn’t capture its environment. Because functions are never allowed to capture their environment, defining and using functions will never incur this overhead.
+
+Closures can capture values from their environment in three ways, which directly map to the three ways a function can take a parameter: `taking ownership`, `borrowing mutably`, and `borrowing immutably`. These are encoded in the three Fn traits as follows:
+
+- `FnOnce` consumes the variables it captures from its enclosing scope, known as the closure’s environment. To consume the captured variables, the closure must take ownership of these variables and move them into the closure when it is defined. The `Once` part of the name represents the fact that the closure can’t take ownership of the same variables more than once, so it can be called only once.
+- `FnMut` can change the environment because it mutably borrows values.
+- `Fn` borrows values from the environment immutably.
+
+**When you create a closure, Rust infers which trait to use based on how the closure uses the values from the environment.** All closures implement `FnOnce` because they can all be called at least once. Closures that don’t move the captured variables also implement `FnMut`, and closures that don’t need mutable access to the captured variables also implement `Fn`. In above example, the `equal_to_x` closure borrows `x` immutably (so `equal_to_x` has the `Fn` trait) because the body of the closure only needs to read the value in `x`.
+
+If you want to force the closure to take ownership of the values it uses in the environment, you can use the `move` keyword before the parameter list. `This technique is mostly useful when passing a closure to a new thread to move the data so it’s owned by the new thread.`
+
+Following code will fail:
+
+```rust
+fn main() {
+    let x = vec![1, 2, 3];
+
+    let equal_to_x = move |z| z == x;
+
+    println!("can't use x here: {:?}", x);  // x is moved so it is not valid here
+
+    let y = vec![1, 2, 3];
+
+    assert!(equal_to_x(y));
+}
+```
+
+The `x` value is moved into the closure when the closure is defined, because we added the `move` keyword. The closure then has ownership of `x`, and main isn’t allowed to use `x` anymore in the `println!` statement. Removing `println!` will fix this example.
+
+> Most of the time when specifying one of the Fn trait bounds, you can start with Fn and the compiler will tell you if you need FnMut or FnOnce based on what happens in the closure body.
