@@ -1605,3 +1605,49 @@ The above code has multiple calls to the slow calculation function. The first if
 ###### Our goal
 
 > we want to refactor this code so it calls the simulated_expensive_calculation function only once. We want to define code in one place in our program, but only execute that code where we actually need the result. This is a use case for closures!
+
+##### Refactoring with closures
+
+Instead of always calling the `simulated_expensive_calculation` function before the if blocks, we can define a closure and store the `closure` in a variable rather than storing the result of the function call.
+
+```rust
+generate_workout(intensity: u32, random_number: u32) {
+    // Closure
+    let expensive_closure = |num| {
+        println!("calculating slowly...");
+        thread::sleep(Duration::from_secs(2));
+        num
+    };
+
+    if intensity < 25 {
+        println!("Today, do {} pushups!", expensive_closure(intensity));
+        println!("Next, do {} situps!", expensive_closure(intensity));
+    } else {
+        if random_number == 3 {
+            println!("Take a break today! Remember to stay hydrated!");
+        } else {
+            println!("Today, run for {} minutes!", expensive_closure(intensity));
+        }
+    }
+}
+```
+
+This closure has one parameter named `num`: if we had more than one parameter, we would separate them with commas, like `|param1, param2|`.
+**`expensive_closure` contains the definition of anonymous function not the resulting value of calling the function. we’re using a closure because we want to define the code to call at one point, store that code, and call it at a later point; the code we want to call is now stored in `expensive_closure`.**
+
+##### Closures type inference
+
+Closures don’t require you to annotate the types of the parameters or the return value like fn functions do. Closures are usually short and relevant only within a narrow context rather than in any arbitrary scenario. The compiler is reliably able to infer the types of the parameters and the return type, similar to how it’s able to infer the types of most variables.
+
+> Closure definitions will have one concrete type inferred for each of their parameters and for their return value.
+
+Following code will error out.
+
+```rust
+let example_closure = |x| x;
+
+let s = example_closure(String::from("hello"));
+let n = example_closure(5);
+```
+
+`The first time we call example_closure with the String value, the compiler infers the type of x and the return type of the closure to be String. Those types are then locked in to the closure in example_closure, and we get a type error if we try to use a different type with the same closure.`
