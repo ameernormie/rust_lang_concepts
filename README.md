@@ -78,6 +78,8 @@
       - [5.3.7.3 Third rule](#third-rule)
     - [5.3.8 Lifetime Annotations in Method Definitions](#lifetime-annotations-in-method-definitions)
     - [5.3.9 The Static Lifetime](#the-static-lifetime)
+- [6 Functional language features: Iterators and Closures](#functional-language-features)
+  - [5.1 Closures](#closures)
 
 ---
 
@@ -1544,3 +1546,62 @@ let s: &'static str = "I have a static lifetime.";
 The text of this string is stored directly in the program’s binary, which is always available. Therefore, the lifetime of all string literals is `'static`.
 
 You might see suggestions to use the `'static` lifetime in error messages. But before specifying `'static` as the lifetime for a reference, think about whether the reference you have actually lives the entire lifetime of your program or not.
+
+---
+
+### Functional language features
+
+#### Closures
+
+> Anonymous Functions that Can Capture Their Environment
+
+Rust’s closures are anonymous functions you can save in a variable or pass as arguments to other functions. You can create the closure in one place and then call the closure to evaluate it in a different context. Unlike functions, closures can capture values from the scope in which they’re defined.
+
+```rust
+use std::thread;
+use std::time::Duration;
+
+fn main() {
+    let simulated_user_specified_value = 10;
+    let simulated_random_number = 7;
+
+    generate_workout(
+        simulated_user_specified_value,
+        simulated_random_number
+    );
+}
+
+fn simulated_expensive_calculation(intensity: u32) -> u32 {
+    println!("calculating slowly...");
+    thread::sleep(Duration::from_secs(2));
+    intensity
+}
+
+fn generate_workout(intensity: u32, random_number: u32) {
+    if intensity < 25 {
+        println!(
+            "Today, do {} pushups!",
+            simulated_expensive_calculation(intensity)
+        );
+        println!(
+            "Next, do {} situps!",
+            simulated_expensive_calculation(intensity)
+        );
+    } else {
+        if random_number == 3 {
+            println!("Take a break today! Remember to stay hydrated!");
+        } else {
+            println!(
+                "Today, run for {} minutes!",
+                simulated_expensive_calculation(intensity)
+            );
+        }
+    }
+}
+```
+
+The above code has multiple calls to the slow calculation function. The first if block calls `simulated_expensive_calculation` twice, the if inside the outer else doesn’t call it at all, and the code inside the second else case calls it once.
+
+###### Our goal
+
+> we want to refactor this code so it calls the simulated_expensive_calculation function only once. We want to define code in one place in our program, but only execute that code where we actually need the result. This is a use case for closures!
