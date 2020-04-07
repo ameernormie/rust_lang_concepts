@@ -9,6 +9,8 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io;
 use std::io::Read;
+use std::thread;
+use std::time::Duration;
 
 #[allow(unused_variables)]
 #[allow(dead_code)]
@@ -244,6 +246,15 @@ fn main() {
 
     let longest_string = longest_of_two_strings(string1.as_str(), string2);
     println!("longest of two strings is {}", longest_string);
+
+    println!(
+        "\n\n\n******************Functional features: Closures and Iterators*******************\n"
+    );
+    println!("\n******************Closures*******************\n");
+    let simulated_user_specified_value = 10;
+    let simulated_random_number = 7;
+
+    generate_workout(simulated_user_specified_value, simulated_random_number)
 }
 
 fn value_in_cents(coin: Coin) -> u8 {
@@ -319,5 +330,26 @@ fn longest_of_two_strings<'a>(x: &'a str, y: &'a str) -> &'a str {
         x
     } else {
         y
+    }
+}
+
+// Closure example
+fn generate_workout(intensity: u32, random_number: u32) {
+    let expensive_closure = |num| {
+        println!("Calculating slowly...");
+        thread::sleep(Duration::from_secs(2));
+        num
+    };
+
+    if intensity < 25 {
+        let get_closure_value_in_one_variable = expensive_closure(intensity);
+        println!("Today, do {} pushups!", get_closure_value_in_one_variable);
+        println!("Next, do {} situps!", get_closure_value_in_one_variable);
+    } else {
+        if random_number == 3 {
+            println!("Take a break today! Remember to stay hydrated!");
+        } else {
+            println!("Today, run for {} minutes!", expensive_closure(intensity));
+        }
     }
 }
