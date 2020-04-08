@@ -79,7 +79,9 @@
     - [5.3.8 Lifetime Annotations in Method Definitions](#lifetime-annotations-in-method-definitions)
     - [5.3.9 The Static Lifetime](#the-static-lifetime)
 - [6 Functional language features: Iterators and Closures](#functional-language-features)
-  - [5.1 Closures](#closures)
+  - [6.1 Closures](#closures)
+  - [6.2 Iterators](#iterators)
+    - [6.2.1 The `Iterator` Trait and the `next` method](#the-iterator-trait-and-the-next-method)
 
 ---
 
@@ -1803,3 +1805,62 @@ fn main() {
 The `x` value is moved into the closure when the closure is defined, because we added the `move` keyword. The closure then has ownership of `x`, and main isn’t allowed to use `x` anymore in the `println!` statement. Removing `println!` will fix this example.
 
 > Most of the time when specifying one of the Fn trait bounds, you can start with Fn and the compiler will tell you if you need FnMut or FnOnce based on what happens in the closure body.
+
+#### Iterators
+
+###### Iterators are lazy
+
+In Rust, iterators are lazy, meaning they have no effect until you call methods that consume the iterator to use it up.
+
+Following code creates an `iterator` over the items in vector `v1`. The code itself doesn't do anything useful.
+
+```rust
+let v1 = vec![1, 2, 3];
+
+// Iterator is stored but not iteration takes place
+let v1_iter = v1.iter();
+
+// Each element in iterator is used in one iteration of loop
+for val in v1_iter {
+    println!("Got: {}", val);
+}
+```
+
+##### The `Iterator` Trait and the `next` method
+
+All Iterators implement a trait named `Iterator` from the standard library.
+
+```rust
+pub trait Iterator {
+    type Item;
+
+    fn next(&mut self) -> Option<Self::Item>;
+
+    // methods with default implementations elided
+}
+```
+
+The `Iterator` trait only requires implementors to define one method: the `next` method, which returns one item of the iterator at a time wrapped in `Some` and, when iteration is over, returns `None`.
+
+```rust
+#[test]
+fn iterator_demonstration() {
+    let v1 = vec![1, 2, 3];
+
+    let mut v1_iter = v1.iter();
+
+    assert_eq!(v1_iter.next(), Some(&1));
+    assert_eq!(v1_iter.next(), Some(&2));
+    assert_eq!(v1_iter.next(), Some(&3));
+    assert_eq!(v1_iter.next(), None);
+}
+```
+
+Things to note:
+
+1. We needed to make `v1_iter` mutable: calling the `next` method on an iterator changes internal state that the iterator uses to keep track of where it is in the sequence.
+2. We didn’t need to make `v1_iter` mutable when we used a `for` loop because the loop took ownership of `v1_iter` and made it mutable behind the scenes.
+3. Values we get from the calls to next are immutable references to the values in the vector.
+4. The `iter` method produces an `iterator` over immutable references.
+5. If we want to create an `iterator` that takes ownership of `v1` and returns owned values, we can call `into_iter` instead of iter.
+6. If we want to iterate over mutable references, we can call `iter_mut` instead of `iter`.
