@@ -275,6 +275,15 @@ fn main() {
     for count in counter {
         println!("count is: {}", count);
     }
+
+    let first_five_nums = Iterators::Counter::new();
+
+    let first_five_nums_incremented: Vec<_> = first_five_nums.map(|x| x + 1).collect();
+
+    println!(
+        "first five nums incremented {:?}",
+        first_five_nums_incremented
+    );
 }
 
 fn value_in_cents(coin: Coin) -> u8 {
