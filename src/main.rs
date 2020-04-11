@@ -1,5 +1,6 @@
 mod closures;
 mod generics_traits_lifetimes;
+mod iterators;
 mod structs;
 
 use std::collections::HashMap;
@@ -11,6 +12,7 @@ use crate::closures as ClosureModule;
 use crate::generics_traits_lifetimes::generics as Generics;
 use crate::generics_traits_lifetimes::traits as Traits;
 use crate::generics_traits_lifetimes::traits::Summary;
+use crate::iterators as Iterators;
 use crate::structs::rectangle;
 use crate::structs::user_struct;
 
@@ -256,7 +258,23 @@ fn main() {
     let simulated_user_specified_value = 10;
     let simulated_random_number = 7;
 
-    ClosureModule::generate_workout(simulated_user_specified_value, simulated_random_number)
+    ClosureModule::generate_workout(simulated_user_specified_value, simulated_random_number);
+
+    println!("\n******************Iterators*******************\n");
+    let v1 = vec![1, 2, 3];
+
+    let v1_iter = v1.iter();
+
+    for val in v1_iter {
+        println!("Iteration: {}", val);
+    }
+
+    println!("\nCustom iterator implementation that counts first five numbers");
+    let counter = Iterators::Counter::new();
+
+    for count in counter {
+        println!("count is: {}", count);
+    }
 }
 
 fn value_in_cents(coin: Coin) -> u8 {
