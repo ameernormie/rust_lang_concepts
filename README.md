@@ -82,6 +82,8 @@
   - [6.1 Closures](#closures)
   - [6.2 Iterators](#iterators)
     - [6.2.1 The `Iterator` Trait and the `next` method](#the-iterator-trait-and-the-next-method)
+    - [6.2.2 Methods that consume the Iterator](#methods-that-consume-the-iterator)
+    - [6.2.3 Methods that Produce Other Iterators](#methods-that-produce-other-iterators)
 
 ---
 
@@ -1864,3 +1866,42 @@ Things to note:
 4. The `iter` method produces an `iterator` over immutable references.
 5. If we want to create an `iterator` that takes ownership of `v1` and returns owned values, we can call `into_iter` instead of iter.
 6. If we want to iterate over mutable references, we can call `iter_mut` instead of `iter`.
+
+##### Methods that consume the Iterator
+
+The Iterator trait has a number of different methods with default implementations provided by the standard library; [Iterator API](https://doc.rust-lang.org/std/iter/trait.Iterator.html).
+
+###### Consuming adapters
+
+> Methods that call next are called consuming adaptors, because calling them uses up the iterator.
+
+One example is the `sum` method, which takes ownership of the iterator and iterates through the items by repeatedly calling `next`, thus consuming the `iterator`.
+
+```rust
+#[test]
+fn iterator_sum() {
+    let v1 = vec![1, 2, 3];
+
+    let v1_iter = v1.iter();
+
+    let total: i32 = v1_iter.sum();
+
+    assert_eq!(total, 6);
+}
+```
+
+##### Methods that Produce Other Iterators
+
+###### Iterator adapters
+
+> These methods allow you to change iterators into different kinds of iterators.
+
+You can chain multiple calls to iterator adaptors to perform complex actions in a readable way. But because all iterators are lazy, you have to call one of the consuming adaptor methods to get results from calls to iterator adaptors.
+
+```rust
+let v1: Vec<i32> = vec![1, 2, 3];
+
+let v2: Vec<_> = v1.iter().map(|x| x + 1).collect();
+
+assert_eq!(v2, vec![2, 3, 4]);
+```
