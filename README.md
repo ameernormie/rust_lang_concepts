@@ -84,6 +84,7 @@
     - [6.2.1 The `Iterator` Trait and the `next` method](#the-iterator-trait-and-the-next-method)
     - [6.2.2 Methods that consume the Iterator](#methods-that-consume-the-iterator)
     - [6.2.3 Methods that Produce Other Iterators](#methods-that-produce-other-iterators)
+    - [6.2.4 Creating Our Own Iterators with the Iterator Trait](#creating-our-own-iterators-with-the-iterator-trait)
 
 ---
 
@@ -1904,4 +1905,32 @@ let v1: Vec<i32> = vec![1, 2, 3];
 let v2: Vec<_> = v1.iter().map(|x| x + 1).collect();
 
 assert_eq!(v2, vec![2, 3, 4]);
+```
+
+##### Creating Our Own Iterators with the Iterator Trait
+
+```rust
+struct Counter {
+    count: usize,
+}
+
+impl Counter {
+    pub fn new() -> Counter {
+        Counter { count: 0 }
+    }
+}
+
+impl Iterator for Counter {
+    type Item = usize;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.count += 1;
+
+        if self.count < 6 {
+            Some(self.count)
+        } else {
+            None
+        }
+    }
+}
 ```

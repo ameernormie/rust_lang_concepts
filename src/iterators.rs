@@ -1,5 +1,5 @@
 pub struct Counter {
-    pub count: usize,
+    count: usize,
 }
 
 impl Counter {
