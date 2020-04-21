@@ -22,6 +22,26 @@ impl Iterator for Counter {
     }
 }
 
+pub struct InfiniteEvenNumbers {
+    num: u32,
+}
+
+impl InfiniteEvenNumbers {
+    pub fn new() -> InfiniteEvenNumbers {
+        InfiniteEvenNumbers { num: 0 }
+    }
+}
+
+impl Iterator for InfiniteEvenNumbers {
+    type Item = u32;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.num += 2;
+
+        Some(self.num)
+    }
+}
+
 #[test]
 fn counter_next_method() {
     let mut counter = Counter::new();

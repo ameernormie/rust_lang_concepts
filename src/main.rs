@@ -276,6 +276,15 @@ fn main() {
         println!("count is: {}", count);
     }
 
+    let mut infinite_even_nums = Iterators::InfiniteEvenNumbers::new();
+
+    let hundreth_even_num = infinite_even_nums.nth(100);
+
+    println!(
+        "The 100th even numbers is {:?} ",
+        hundreth_even_num.unwrap()
+    );
+
     let first_five_nums = Iterators::Counter::new();
 
     let first_five_nums_incremented: Vec<_> = first_five_nums.map(|x| x + 1).collect();
