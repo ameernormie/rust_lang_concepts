@@ -1,6 +1,7 @@
 mod closures;
 mod generics_traits_lifetimes;
 mod iterators;
+mod smart_pointers;
 mod structs;
 
 use std::collections::HashMap;
@@ -13,6 +14,7 @@ use crate::generics_traits_lifetimes::generics as Generics;
 use crate::generics_traits_lifetimes::traits as Traits;
 use crate::generics_traits_lifetimes::traits::Summary;
 use crate::iterators as Iterators;
+use crate::smart_pointers as SmartPointers;
 use crate::structs::rectangle;
 use crate::structs::user_struct;
 
@@ -293,6 +295,17 @@ fn main() {
         "first five nums incremented {:?}",
         first_five_nums_incremented
     );
+
+    println!("\n\n\n******************Smart Pointers*******************\n");
+    println!("\n******************Box<T>*******************\n");
+    println!(
+        "\n******************Treat smart pointers like regular references*******************\n"
+    );
+    let x = 5;
+    let y = SmartPointers::MyBox::new(x);
+
+    assert_eq!(5, x);
+    assert_eq!(5, *y);
 }
 
 fn value_in_cents(coin: Coin) -> u8 {
