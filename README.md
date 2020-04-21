@@ -86,6 +86,7 @@
     - [6.2.3 Methods that Produce Other Iterators](#methods-that-produce-other-iterators)
     - [6.2.4 Creating Our Own Iterators with the Iterator Trait](#creating-our-own-iterators-with-the-iterator-trait)
 - [7 Smart Pointers](#smart-pointers)
+  - [7.1 Using `Box` to Point to Data on the Heap](#using-box-to-point-to-data-on-the-heap)
 
 ---
 
@@ -1955,3 +1956,77 @@ We’ll cover the most common smart pointers in the standard library:
 - `Box<T>` for allocating values on the heap
 - `Rc<T>`, a reference counting type that enables multiple ownership
 - `Ref<T>` and `RefMut<T>`, accessed through `RefCell<T>`, a type that enforces the borrowing rules at runtime instead of compile time
+
+#### Using `Box` to Point to Data on the Heap
+
+The most straightforward smart pointer is a box, whose type is written `Box<T>`. Boxes allow you to store data on the heap rather than the stack.
+
+When to use `Box`:
+
+1. When you have a type whose size can’t be known at compile time and you want to use a value of that type in a context that requires an exact size
+2. When you have a large amount of data and you want to transfer ownership but ensure the data won’t be copied when you do so
+3. When you want to own a value and you care only that it’s a type that implements a particular trait rather than being of a specific type
+
+##### Using a Box<T> to Store Data on the Heap
+
+```rust
+fn main() {
+    let b = Box::new(5);
+    println!("b = {}", b);
+}
+```
+
+We define the variable b to have the value of a `Box` that points to the value `5`, which is allocated on the heap.
+
+##### Enabling Recursive Types with Boxes
+
+> At compile time, Rust needs to know how much space a type takes up. One type whose size can’t be known at compile time is a recursive type, where a value can have as part of itself another value of the same type. Because this nesting of values could theoretically continue infinitely, Rust doesn’t know how much space a value of a recursive type needs.
+
+`However, boxes have a known size, so by inserting a box in a recursive type definition, you can have recursive types.`
+
+##### What is a `Cons list`
+
+> A cons list is a data structure that comes from the Lisp programming language and its dialects. In Lisp, the `cons` function (short for “construct function”) constructs a new pair from its two arguments, which usually are a single value and another pair. These pairs containing pairs form a list.
+
+The cons function concept has made its way into more general functional programming jargon: `“to cons x onto y”` informally means to construct a new container instance by putting the element `x` at the start of this new container, followed by the container `y`.
+
+Each item in a cons list contains two elements: the value of the current item and the next item. The last item in the list contains only a value called `Nil` without a next item. A cons list is produced by recursively calling the `cons` function.
+
+Following code fails:
+
+```rust
+enum List {
+    Cons(i32, List),
+    Nil,
+}
+
+fn main() {
+    let list = Cons(1, Cons(2, Cons(3, Nil)));
+}
+```
+
+The error shows this type “has infinite size.” The reason is that we’ve defined List with a variant that is recursive: it holds another value of itself directly. As a result, Rust can’t figure out how much space it needs to store a List value.
+
+##### Using `Box<T>` to Get a Recursive Type with a Known Size
+
+```rust
+enum List {
+    Cons(i32, Box<List>),
+    Nil,
+}
+
+use crate::List::{Cons, Nil};
+
+fn main() {
+    let list = Cons(1,
+        Box::new(Cons(2,
+            Box::new(Cons(3,
+                Box::new(Nil))))));
+}
+```
+
+The `Cons` variant will need the size of an `i32` plus the space to store the box’s pointer data. The `Nil` variant stores no values, so it needs less space than the `Cons` variant.
+
+Boxes provide only the indirection and heap allocation; they don’t have any other special capabilities, like those we’ll see with the other smart pointer types.
+
+> The `Box<T>` type is a smart pointer because it implements the `Deref` trait, which allows `Box<T>` values to be treated like references. When a `Box<T>` value goes out of scope, the heap data that the box is pointing to is cleaned up as well because of the `Drop` trait implementation.
