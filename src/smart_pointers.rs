@@ -1,4 +1,10 @@
 use std::ops::Deref;
+use std::rc::Rc;
+
+pub enum RcList {
+    Cons(i32, Rc<RcList>),
+    Nil,
+}
 
 // The MyBox type is a tuple struct with one element of type T.
 pub struct MyBox<T>(T);

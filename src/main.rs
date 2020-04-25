@@ -8,6 +8,7 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io;
 use std::io::Read;
+use std::rc::Rc;
 
 use crate::closures as ClosureModule;
 use crate::generics_traits_lifetimes::generics as Generics;
@@ -15,6 +16,7 @@ use crate::generics_traits_lifetimes::traits as Traits;
 use crate::generics_traits_lifetimes::traits::Summary;
 use crate::iterators as Iterators;
 use crate::smart_pointers as SmartPointers;
+use crate::smart_pointers::RcList::{Cons, Nil};
 use crate::structs::rectangle;
 use crate::structs::user_struct;
 
@@ -304,6 +306,9 @@ fn main() {
     let x = 5;
     let y = SmartPointers::MyBox::new(x);
 
+    assert_eq!(5, x);
+    assert_eq!(5, *y);
+
     let c = SmartPointers::CustomSmartPointer {
         data: String::from("my stuff"),
     };
@@ -312,8 +317,28 @@ fn main() {
     };
     println!("CustomSmartPointers created.");
 
-    assert_eq!(5, x);
-    assert_eq!(5, *y);
+    println!("\n******************Reference counted smart pointer Rc<T>*******************\n");
+    let a = Rc::new(Cons(5, Rc::new(Cons(10, Rc::new(Nil)))));
+    println!(
+        "reference count after creating a = {}",
+        Rc::strong_count(&a)
+    );
+    let b = Cons(3, Rc::clone(&a));
+    println!(
+        "reference count after creating b = {}",
+        Rc::strong_count(&a)
+    );
+    {
+        let c = Cons(4, Rc::clone(&a));
+        println!(
+            "reference count after creating c = {}",
+            Rc::strong_count(&a)
+        );
+    }
+    println!(
+        "reference count after c goes out of scope = {}",
+        Rc::strong_count(&a)
+    );
 }
 
 fn value_in_cents(coin: Coin) -> u8 {
