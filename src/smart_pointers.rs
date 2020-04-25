@@ -16,3 +16,13 @@ impl<T> Deref for MyBox<T> {
         &self.0
     }
 }
+
+pub struct CustomSmartPointer {
+    pub data: String,
+}
+
+impl Drop for CustomSmartPointer {
+    fn drop(&mut self) {
+        println!("dropping custom smart pointer data `{}`!", self.data);
+    }
+}

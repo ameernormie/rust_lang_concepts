@@ -304,6 +304,14 @@ fn main() {
     let x = 5;
     let y = SmartPointers::MyBox::new(x);
 
+    let c = SmartPointers::CustomSmartPointer {
+        data: String::from("my stuff"),
+    };
+    let d = SmartPointers::CustomSmartPointer {
+        data: String::from("other stuff"),
+    };
+    println!("CustomSmartPointers created.");
+
     assert_eq!(5, x);
     assert_eq!(5, *y);
 }

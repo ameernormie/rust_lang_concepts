@@ -2086,3 +2086,34 @@ impl<T> Deref for MyBox<T> {
     }
 }
 ```
+
+#### Running Code on Cleanup with the Drop Trait
+
+```rust
+pub struct CustomSmartPointer {
+    pub data: String,
+}
+
+impl Drop for CustomSmartPointer {
+    fn drop(&mut self) {
+        println!("dropping custom smart pointer data `{}`!", self.data);
+    }
+}
+```
+
+##### Dropping a Value Early with `std::mem::drop`
+
+Disabling drop isn’t usually necessary; the whole point of the `Drop` trait is that it’s taken care of automatically. Occasionally, however, you might want to clean up a value early. One example is when using smart pointers that manage locks: you might want to force the drop method that releases the lock so that other code in the same scope can acquire the lock. Rust doesn’t let you call the `Drop` trait’s drop method manually; instead you have to call the `std::mem::drop` function provided by the standard library if you want to force a value to be dropped before the end of its scope.
+
+The `std::mem::drop` function is different from the drop method in the `Drop` trait. We call it by passing the value we want to force to be dropped early as an argument.
+
+```rust
+fn main() {
+    let c = CustomSmartPointer {
+        data: String::from("some data"),
+    };
+    println!("CustomSmartPointer created.");
+    drop(c);
+    println!("CustomSmartPointer dropped before the end of main.");
+}
+```
