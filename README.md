@@ -87,6 +87,7 @@
     - [6.2.4 Creating Our Own Iterators with the Iterator Trait](#creating-our-own-iterators-with-the-iterator-trait)
 - [7 Smart Pointers](#smart-pointers)
   - [7.1 Using `Box` to Point to Data on the Heap](#using-box-to-point-to-data-on-the-heap)
+  - [7.2 Treating Smart Pointers Like Regular References with the Deref Trait](#treating-smart-pointers-like-regular-references-with-the-deref-trait)
 
 ---
 
@@ -2030,3 +2031,58 @@ The `Cons` variant will need the size of an `i32` plus the space to store the bo
 Boxes provide only the indirection and heap allocation; they don’t have any other special capabilities, like those we’ll see with the other smart pointer types.
 
 > The `Box<T>` type is a smart pointer because it implements the `Deref` trait, which allows `Box<T>` values to be treated like references. When a `Box<T>` value goes out of scope, the heap data that the box is pointing to is cleaned up as well because of the `Drop` trait implementation.
+
+#### Treating Smart Pointers Like Regular References with the Deref Trait
+
+Implementing the `Deref` trait allows you to customize the behavior of the dereference operator, \* (as opposed to the multiplication or glob operator). By implementing Deref in such a way that a smart pointer can be treated like a regular reference, you can write code that operates on references and use that code with smart pointers too.
+
+##### Following the Pointer to the Value with the Dereference Operator
+
+```rust
+fn main() {
+let x = 5;
+let y = &x;
+
+    assert_eq!(5, x);
+    assert_eq!(5, *y);
+
+}
+```
+
+The variable `x` holds an `i32` value, `5`. We set `y` equal to a reference to `x`. We can assert that `x` is equal to `5`. However, if we want to make an assertion about the value in `y`, we have to use `*y` to follow the reference to the value it’s pointing to (hence dereference). Once we dereference `y`, we have access to the integer value `y` is pointing to that we can compare with `5`.
+
+##### Using `Box<T>` Like a Reference
+
+```rust
+fn main() {
+    let x = 5;
+    let y = Box::new(x);
+
+    assert_eq!(5, x);
+    assert_eq!(5, *y);
+}
+```
+
+Here we set `y` to be an instance of a box pointing to the value in `x` rather than a reference pointing to the value of `x`. In the last assertion, we can use the dereference operator to follow the box’s pointer in the same way that we did when `y` was a reference.
+`What is special about Box<T> that enables us to use the dereference operator by defining our own box type`
+
+##### Defining Our Own Smart Pointer
+
+```rust
+// The MyBox type is a tuple struct with one element of type T.
+pub struct MyBox<T>(T);
+
+impl<T> MyBox<T> {
+    pub fn new(x: T) -> MyBox<T> {
+        MyBox(x)
+    }
+}
+
+impl<T> Deref for MyBox<T> {
+    type Target = T;
+
+    fn deref(&self) -> &T {
+        &self.0
+    }
+}
+```
