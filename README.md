@@ -2175,3 +2175,57 @@ Similar to `Rc<T>`, `RefCell<T>` is only for use in single-threaded scenarios an
 ###### A Use Case for Interior Mutability: Mock Objects
 
 A test double is the general programming concept for a type used in place of another type during testing. Mock objects are specific types of test doubles that record what happens during a test so you can assert that the correct actions took place.
+
+Example in `smart_pointers.rs` module.
+
+##### Keeping Track of Borrows at Runtime with `RefCell<T>`
+
+When creating immutable and mutable references, we use the `&` and `&mut` syntax, respectively. With `RefCell<T>`, we use the borrow and borrow_mut methods, which are part of the safe API that belongs to `RefCell<T>`. The borrow method returns the smart pointer type `Ref<T>`, and borrow_mut returns the smart pointer type `RefMut<T>`. Both types implement `Deref`, so we can treat them like regular references.
+
+The `RefCell<T>` keeps track of how many `Ref<T>` and `RefMut<T>` smart pointers are currently active. Every time we call borrow, the `RefCell<T>` increases its count of how many immutable borrows are active. When a `Ref<T>` value goes out of scope, the count of immutable borrows goes down by one. Just like the compile-time borrowing rules, `RefCell<T>` lets us have many immutable borrows or one mutable borrow at any point in time.
+
+If we try to violate these rules, rather than getting a compiler error as we would with references, the implementation of `RefCell<T>` will panic at runtime.
+
+```rust
+// This code fails at runtime
+impl Messenger for MockMessenger {
+    fn send(&self, message: &str) {
+        let mut one_borrow = self.sent_messages.borrow_mut();
+        let mut two_borrow = self.sent_messages.borrow_mut();
+
+        one_borrow.push(String::from(message));
+        two_borrow.push(String::from(message));
+    }
+}
+```
+
+##### Having Multiple Owners of Mutable Data by Combining `Rc<T>` and `RefCell<T>`
+
+A common way to use `RefCell<T>` is in combination with `Rc<T>.` Recall that `Rc<T>` lets you have multiple owners of some data, but it only gives immutable access to that data. If you have an `Rc<T>` that holds a `RefCell<T>,` you can get a value that can have multiple owners and that you can mutate!
+
+```rust
+#[derive(Debug)]
+enum List {
+    Cons(Rc<RefCell<i32>>, Rc<List>),
+    Nil,
+}
+
+use crate::List::{Cons, Nil};
+use std::cell::RefCell;
+use std::rc::Rc;
+
+fn main() {
+    let value = Rc::new(RefCell::new(5));
+
+    let a = Rc::new(Cons(Rc::clone(&value), Rc::new(Nil)));
+
+    let b = Cons(Rc::new(RefCell::new(6)), Rc::clone(&a));
+    let c = Cons(Rc::new(RefCell::new(10)), Rc::clone(&a));
+
+    *value.borrow_mut() += 10;
+
+    println!("a after = {:?}", a);
+    println!("b after = {:?}", b);
+    println!("c after = {:?}", c);
+}
+```
