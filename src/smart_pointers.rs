@@ -21,7 +21,11 @@ pub enum RcList {
     Nil,
 }
 
-// The MyBox type is a tuple struct with one element of type T.
+// Defining Our Own Smart Pointer
+
+// Let’s build a smart pointer similar to the Box<T> type provided by the standard library
+// to experience how smart pointers behave differently from references by default.
+// Then we’ll look at how to add the ability to use the dereference operator.
 pub struct MyBox<T>(T);
 
 impl<T> MyBox<T> {
@@ -30,6 +34,7 @@ impl<T> MyBox<T> {
     }
 }
 
+// Treating a Type Like a Reference by Implementing the Deref Trait
 impl<T> Deref for MyBox<T> {
     type Target = T;
 
