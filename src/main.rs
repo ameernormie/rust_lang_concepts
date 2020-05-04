@@ -16,6 +16,7 @@ use crate::generics_traits_lifetimes::traits as Traits;
 use crate::generics_traits_lifetimes::traits::Summary;
 use crate::iterators as Iterators;
 use crate::smart_pointers as SmartPointers;
+use crate::smart_pointers::BoxList;
 use crate::smart_pointers::RcList::{Cons, Nil};
 use crate::structs::rectangle;
 use crate::structs::user_struct;
@@ -300,6 +301,13 @@ fn main() {
 
     println!("\n\n\n******************Smart Pointers*******************\n");
     println!("\n******************Box<T>*******************\n");
+    let list = BoxList::Cons(
+        1,
+        Box::new(BoxList::Cons(
+            1,
+            Box::new(BoxList::Cons(3, Box::new(BoxList::Nil))),
+        )),
+    );
     println!(
         "\n******************Treat smart pointers like regular references*******************\n"
     );
@@ -339,6 +347,8 @@ fn main() {
         "reference count after c goes out of scope = {}",
         Rc::strong_count(&a)
     );
+
+    println!("\n******************Interior mutability RefCell<T>*******************\n");
 }
 
 fn value_in_cents(coin: Coin) -> u8 {
