@@ -1,6 +1,21 @@
 use std::ops::Deref;
 use std::rc::Rc;
 
+// Enabling Recursive Types with Boxes
+// A cons list is a data structure that comes from the Lisp programming language and its dialects.
+// In Lisp, the cons function (short for “construct function”) constructs a new pair from its two
+// arguments, which usually are a single value and another pair. These pairs containing pairs form a list.
+
+// Each item in a cons list contains two elements: the value of the current item and the next item.
+// The last item in the list contains only a value called Nil without a next item. A cons list is
+// produced by recursively calling the cons function.
+
+// Using Box<T> to Get a Recursive Type with a Known Size
+pub enum BoxList {
+    Cons(i32, Box<BoxList>),
+    Nil,
+}
+
 pub enum RcList {
     Cons(i32, Rc<RcList>),
     Nil,
