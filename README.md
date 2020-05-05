@@ -90,6 +90,8 @@
   - [7.2 Treating Smart Pointers Like Regular References with the Deref Trait](#treating-smart-pointers-like-regular-references-with-the-deref-trait)
   - [7.3 Running code on cleanup with Drop trait](#running-code-on-cleanup-with-the-drop-trait)
   - [7.4 `Rc<T>`, the Reference Counted Smart Pointer]
+  - [7.5 RefCell and the Interior Mutability Pattern](#refCell-and-the-interior-mutability-pattern)
+  - [7.6 Reference Cycles Can Leak Memory](#reference-cycles-can-leak-memory)
 
 ---
 
@@ -2152,7 +2154,7 @@ fn main() {
 
 The implementation of `Rc::clone` doesn’t make a deep copy of all the data like most types’ implementations of `clone` do. The call to `Rc::clone` only increments the reference count, which doesn’t take much time. Deep copies of data can take a lot of time.
 
-#### `RefCell<T>` and the Interior Mutability Pattern
+#### RefCell and the Interior Mutability Pattern
 
 Interior mutability is a design pattern in Rust that allows you to mutate data even when there are immutable references to that data; normally, this action is disallowed by the borrowing rules. To mutate data, the pattern uses unsafe code inside a data structure to bend Rust’s usual rules that govern mutation and borrowing. We haven’t yet covered `unsafe` code; we will in Chapter 19. We can use types that use the interior mutability pattern when we can ensure that the borrowing rules will be followed at runtime, even though the compiler can’t guarantee that. The `unsafe` code involved is then wrapped in a safe API, and the outer type is still immutable.
 
@@ -2229,3 +2231,7 @@ fn main() {
     println!("c after = {:?}", c);
 }
 ```
+
+#### Reference Cycles Can Leak Memory
+
+We can see that Rust allows memory leaks by using `Rc<T>` and `RefCell<T>`: it’s possible to create references where items refer to each other in a cycle. This creates memory leaks because the reference count of each item in the cycle will never reach 0, and the values will never be dropped.
